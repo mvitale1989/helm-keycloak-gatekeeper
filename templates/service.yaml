@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "auth-proxy.fullname" . }}
+  labels:
+{{ include "auth-proxy.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      protocol: TCP
+      name: http
+      targetPort: http
+  selector:
+{{ include "auth-proxy.labels" . | indent 4 }}
+...

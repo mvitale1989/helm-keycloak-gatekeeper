@@ -1,0 +1,15 @@
+apiVersion: v1
+name: auth-proxy
+version: 0.5.0
+kubeVersion: ">=1.10.0"
+description: Authenticating proxy, based on gambol99/keycloak-proxy
+keyworkds:
+- sso
+- oidc
+- openid
+- keycloak
+home: https://github.com/mvitale1989/auth-proxy
+maintainers:
+- name: mvitale1989
+  email: mvitale1989@hotmail.com
+appVersion: "v2.3.0"

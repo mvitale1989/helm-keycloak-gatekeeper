@@ -1,0 +1,75 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "auth-proxy.fullname" . }}
+spec:
+  replicas: 1
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+{{ include "auth-proxy.labels" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+{{ include "auth-proxy.labels" . | indent 8 }}
+      annotations:
+        checksum/config: {{ include (print .Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      securityContext:
+        fsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+      - name: main
+        image: {{ .Values.image.name }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.proxyOptions.listenPort }}
+          protocol: TCP
+        args:
+        - --listen=0.0.0.0:{{ .Values.proxyOptions.listenPort }}
+        - --client-id={{ .Values.oidc.clientId | required "oidc.clientId not set" }}
+        - --client-secret={{ .Values.oidc.clientSecret | required "oidc.clientSecret not set" }}
+        - --discovery-url={{ .Values.oidc.discoveryUrl | required "oidc.discoveryUrl not set" }}
+        - --upstream-url=http://{{ .Values.upstreamServiceName | required "upstreamServiceName not set" }}
+        - --sign-in-page=/opt/templates/sign_in.html.tmpl
+        - --forbidden-page=/opt/templates/forbidden.html.tmpl
+        - --enable-session-cookies
+        - --http-only-cookie=true
+        - --preserve-host=true
+        {{- if .Values.oidc.allowedRoles }}
+        - --resources=uri=/*|roles={{ .Values.oidc.allowedRoles | join "," }}
+        {{- end }}
+        {{- if .Values.oidc.skipOpenIDProviderTlsVerify }}
+        - --skip-openid-provider-tls-verify
+        {{- end }}
+        {{- if .Values.proxyOptions.tokenEncryption }}
+        - --enable-encrypted-token=true
+        - --encryption-key={{ .Values.proxyOptions.tokenEncryptionKey | default (randAlphaNum 16)  }}
+        {{- end }}
+        {{- if .Values.proxyOptions.enableHttpLogging }}
+        - --enable-logging=true
+        - --enable-json-logging=true
+        {{- end }}
+        {{- if .Values.proxyOptions.verbose }}
+        - --verbose
+        {{- end }}
+
+        {{- if not .Values.proxyOptions.useUpstreamPageTemplates }}
+        volumeMounts:
+        - name: page-templates
+          mountPath: /opt/templates/forbidden.html.tmpl
+          subPath: forbidden-page
+        - name: page-templates
+          mountPath: /opt/templates/sign_in.html.tmpl
+          subPath: login-page
+        {{- end }}
+        securityContext:
+            readOnlyRootFilesystem: true
+      volumes:
+      - name: page-templates
+        configMap:
+          name: {{ include "auth-proxy.fullname" . }}-page-templates
+...

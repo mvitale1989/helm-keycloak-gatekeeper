@@ -1,0 +1,54 @@
+# Default values for auth-proxy.
+
+image:
+  name: quay.io/gambol99/keycloak-proxy
+  tag: v2.3.0
+  pullPolicy: IfNotPresent
+
+# Labels to be applied to all objects of this chart
+extraLabels: {}
+
+# Service pointing internally to the auth-proxy
+service:
+  type: ClusterIP
+  port: 80
+
+# Service that this proxy will forward requests to
+upstreamServiceName: ""
+
+# Enable if you want to access the auth-proxy from the external world, through the ingress-controller
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  path: /
+  hosts:
+  - chart-example.local
+  tls: []
+  # - secretName: chart-example-tls
+  #   hosts:
+  #   - chart-example.local
+
+# OpenID Connect configuration, to fill according to how you configured the trusted IdP
+oidc:
+  clientId: ""
+  clientSecret: ""
+  discoveryUrl: ""
+  allowedRoles: [] # Empty array means there are no restrictions based on the roles in the user claims
+  skipOpenIDProviderTlsVerify: false # For testing only
+
+# Page templates:
+# - Forbidden page: shown when user is not authorized to access the resource (e.g. user does not have the required role).
+# - Login page: shown when user has no token, or it's expired. In this template, `{{ .redirect }}` will expand to the login page link.
+# - Leave empty to use the page templates included in this chart (unless useUpstreamPageTemplates is enabled)
+# - If you want to use the upstream page templates included in keycloak-proxy, enable useUpstreamPageTemplates
+proxyOptions:
+  listenPort: 3000
+  tokenEncryption: true
+  # tokenEncryptionKey: ""
+  enableHttpLogging: false
+  useUpstreamPageTemplates: false
+  forbiddenPageTemplate: ""
+  loginPageTemplate: ""
+  verbose: false
