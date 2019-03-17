@@ -2,17 +2,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "auth-proxy.fullname" . }}
+  name: {{ include "keycloak-gatekeeper.fullname" . }}
 spec:
   replicas: 1
   revisionHistoryLimit: 0
   selector:
     matchLabels:
-{{ include "auth-proxy.labels" . | indent 6 }}
+{{ include "keycloak-gatekeeper.labels" . | indent 6 }}
   template:
     metadata:
       labels:
-{{ include "auth-proxy.labels" . | indent 8 }}
+{{ include "keycloak-gatekeeper.labels" . | indent 8 }}
       annotations:
         checksum/config: {{ include (print .Template.BasePath "/configmap.yaml") . | sha256sum }}
     spec:
@@ -33,9 +33,13 @@ spec:
         - --client-id={{ .Values.oidc.clientId | required "oidc.clientId not set" }}
         - --client-secret={{ .Values.oidc.clientSecret | required "oidc.clientSecret not set" }}
         - --discovery-url={{ .Values.oidc.discoveryUrl | required "oidc.discoveryUrl not set" }}
-        - --upstream-url=http://{{ .Values.upstreamServiceName | required "upstreamServiceName not set" }}
+        - --upstream-url={{ .Values.upstreamUrl | required "upstreamUrl not set" }}
+        {{- if .Values.proxyOptions.userFriendlyPages.enableLoginPage }}
         - --sign-in-page=/opt/templates/sign_in.html.tmpl
+        {{- end }}
+        {{- if .Values.proxyOptions.userFriendlyPages.enableForbiddenPage }}
         - --forbidden-page=/opt/templates/forbidden.html.tmpl
+        {{- end }}
         - --enable-session-cookies
         - --http-only-cookie=true
         - --preserve-host=true
@@ -57,7 +61,7 @@ spec:
         - --verbose
         {{- end }}
 
-        {{- if not .Values.proxyOptions.useUpstreamPageTemplates }}
+        {{- if not .Values.proxyOptions.userFriendlyPages.useUpstreamTemplates }}
         volumeMounts:
         - name: page-templates
           mountPath: /opt/templates/forbidden.html.tmpl
@@ -71,5 +75,5 @@ spec:
       volumes:
       - name: page-templates
         configMap:
-          name: {{ include "auth-proxy.fullname" . }}-page-templates
+          name: {{ include "keycloak-gatekeeper.fullname" . }}-page-templates
 ...
