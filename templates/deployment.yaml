@@ -2,17 +2,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "auth-proxy.fullname" . }}
+  name: {{ include "keycloak-gatekeeper.fullname" . }}
 spec:
   replicas: 1
   revisionHistoryLimit: 0
   selector:
     matchLabels:
-{{ include "auth-proxy.labels" . | indent 6 }}
+{{ include "keycloak-gatekeeper.labels" . | indent 6 }}
   template:
     metadata:
       labels:
-{{ include "auth-proxy.labels" . | indent 8 }}
+{{ include "keycloak-gatekeeper.labels" . | indent 8 }}
       annotations:
         checksum/config: {{ include (print .Template.BasePath "/configmap.yaml") . | sha256sum }}
     spec:
@@ -75,5 +75,5 @@ spec:
       volumes:
       - name: page-templates
         configMap:
-          name: {{ include "auth-proxy.fullname" . }}-page-templates
+          name: {{ include "keycloak-gatekeeper.fullname" . }}-page-templates
 ...

@@ -1,4 +1,4 @@
-# auth-proxy
+# helm-keycloak-gatekeeper
 A helm chart for installing an OpenID Connect authenticating proxy in front of your HTTP services. Based on the excellent [keycloak/keycloak-gatekeeper](https://github.com/keycloak/keycloak-gatekeeper).
 
 ### How it works

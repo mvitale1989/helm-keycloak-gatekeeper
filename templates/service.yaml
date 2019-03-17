@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "auth-proxy.fullname" . }}
+  name: {{ include "keycloak-gatekeeper.fullname" . }}
   labels:
-{{ include "auth-proxy.labels" . | indent 4 }}
+{{ include "keycloak-gatekeeper.labels" . | indent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -13,5 +13,5 @@ spec:
       name: http
       targetPort: http
   selector:
-{{ include "auth-proxy.labels" . | indent 4 }}
+{{ include "keycloak-gatekeeper.labels" . | indent 4 }}
 ...

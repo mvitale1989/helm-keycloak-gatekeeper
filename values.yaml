@@ -1,14 +1,14 @@
-# Default values for auth-proxy.
+# Default values for keycloak-gatekeeper.
 
 image:
   name: keycloak/keycloak-gatekeeper
-  tag: 4.6.0.Final
+  tag: 5.0.0
   pullPolicy: IfNotPresent
 
 # Labels to be applied to all objects of this chart
 extraLabels: {}
 
-# Service pointing internally to the auth-proxy
+# Service pointing internally to the keycloak-gatekeeper
 service:
   type: ClusterIP
   port: 80
@@ -16,7 +16,7 @@ service:
 # URL that this proxy will forward requests to
 upstreamUrl: ""
 
-# Enable if you want to access the auth-proxy from the external world, through the ingress-controller
+# Enable if you want to access the keycloak-gatekeeper from the external world, through the ingress-controller
 ingress:
   enabled: false
   annotations: {}

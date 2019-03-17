@@ -1,13 +1,13 @@
 ---
 {{- if .Values.ingress.enabled }}
-{{- $fullname := include "auth-proxy.fullname" . -}}
+{{- $fullname := include "keycloak-gatekeeper.fullname" . -}}
 {{- $ingressPath := .Values.ingress.path }}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: {{ $fullname }}
   labels:
-{{ include "auth-proxy.labels" . | indent 4 }}
+{{ include "keycloak-gatekeeper.labels" . | indent 4 }}
 {{- with .Values.ingress.annotations }}
   annotations:
 {{ toYaml . | indent 4 }}
