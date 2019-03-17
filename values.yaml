@@ -1,8 +1,8 @@
 # Default values for auth-proxy.
 
 image:
-  name: quay.io/gambol99/keycloak-proxy
-  tag: v2.3.0
+  name: keycloak/keycloak-gatekeeper
+  tag: 4.6.0.Final
   pullPolicy: IfNotPresent
 
 # Labels to be applied to all objects of this chart
@@ -13,8 +13,8 @@ service:
   type: ClusterIP
   port: 80
 
-# Service that this proxy will forward requests to
-upstreamServiceName: ""
+# URL that this proxy will forward requests to
+upstreamUrl: ""
 
 # Enable if you want to access the auth-proxy from the external world, through the ingress-controller
 ingress:
@@ -48,7 +48,10 @@ proxyOptions:
   tokenEncryption: true
   # tokenEncryptionKey: ""
   enableHttpLogging: false
-  useUpstreamPageTemplates: false
-  forbiddenPageTemplate: ""
-  loginPageTemplate: ""
+  userFriendlyPages:
+    enableLoginPage: true
+    enableForbiddenPage: true
+    useUpstreamTemplates: false
+    forbiddenPageTemplate: ""
+    loginPageTemplate: ""
   verbose: false
